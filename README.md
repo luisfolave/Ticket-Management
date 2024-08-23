@@ -35,6 +35,7 @@ Event: Este modelo representa la tabla “event” en la base de datos. El model
 ### Controlador
 
 EventController: Este controlador maneja las operaciones que tiene relación a los eventos. En particular, se hace uso del método “listEvents()”, el cual realiza una consulta para obtener la lista de eventos disponibles en la base de datos, y retorna los datos más relevantes de cada uno, en formato JSON.
+
 ```php
 public function listEvents()
     {
@@ -70,6 +71,29 @@ Event: Se utiliza el mismo modelo que en el endpoint anterior.
 
 EventController: En este caso, se hace uso del método “eventDetails()”, el cual realiza una consulta en la base de datos, para obtener los detalles de un evento especifico basado en su “event_id”, el cual se debe adjuntar al método. También retorna la información completa del evento en formato JSON.
 
+```php
+public function eventDetails($eventID)
+    {
+        try {
+            $event = Event::where('event_id', $eventID)
+                ->select('event_name', 'organizer_name', 'description', 'description_details', 'event_date', 'location', 'ticket_price')
+                ->first();
+
+            // Comprobar que se obtuvo informacion del evento correctamente
+            if (!$event) {
+                $data = ['message' => 'Evento no encontrado'];
+                return response()->json($data, 404);
+            }
+
+            $data = $event;
+            return response()->json($data, 200);
+        } catch (Exception $e) {
+            $data = ['error' => 'Ocurrió un error al obtener la informacion del evento: ' . $e->getMessage()];
+            return response()->json($data, 500);
+        }
+    }
+```
+
 ### Ruta
 
 La ruta definida para el endpoints es:
@@ -95,6 +119,92 @@ Ticket: Este modelo representa la tabla “ticket” en la base de datos. Se uti
 ### Controlador
 
 PurchaseController: Este controlador maneja las operaciones de compra de tickets. En este caso, se utiliza el metodo “buyTickets()”, el cual crear un registro de la compra en la tabla “purchase”  y asocia los tickets con la compra realizada en la tabla “ticket”. Este método, además, verifica que los datos ingresados sean válidos, tales como que el correo electrónico cumpla con el formato de electrónico, el número telefónico debe estar compuesto por exactamente 9 dígitos, el evento al que se referencia debe existir, el asiento no debe de haber sido comprado antes en el evento, además debe componerse de 3 caracteres, de los cuales el primero es una letra y los que le siguen sean números (e., “A01”, “B23”), agregar también que se puede hacer compras de varios tickets en un solo proceso tan solo dejando una “,” sin espacio entre los asientos (e., “A01,A02,A03”),  el tipo del ticket solo pueden ser “Regular” o  “Premium”, y que el precio ingresado no puede ser un monto menor al costo establecido para el evento.
+
+```php
+public function buyTickets(Request $request)
+    {
+        try {
+            $event = Event::find($request->event_id);
+    
+            if (!$event) {
+                return response()->json(['error' => 'El evento no existe.'], 404);
+            }
+    
+            $ticketPrice = $event->ticket_price;
+    
+            $request->validate([
+                'client_name' => 'required|string',
+                'client_mail' => 'required|email',
+                'client_phone' => 'nullable|string|size:9', // Validar nuúmero telefonico con 9 caracteres
+                'event_id' => 'required|string|exists:event,event_id', // Validar evento existente
+                'seat_numbers' => [
+                    'required',
+                    'string',
+                    //Validar formato de asiento con 1 digito seguido de 2 letras
+                    function ($attribute, $value, $fail) {
+                        $seats = array_map('trim', explode(',', $value));
+                        foreach ($seats as $seat) {
+                            if (!preg_match('/^[A-Z]\d{1,}$/', $seat)) {
+                                $fail("El asiento $seat no tiene un formato válido.");
+                            }
+                        }
+                    },
+                    'size:3' // Validar formato de asiento con 3 caracteres
+                ],
+                'ticket_type' => ['required', Rule::in(['Regular', 'Premium'])], // Validar tipo de ticket entre dos tipos
+                'price' => [
+                    'required',
+                    'numeric',
+                    'min:' . $ticketPrice, // Validar que precio pagado sea minimo el precio del ticket
+                ]
+            ]);
+    
+            $purchaseID = (string) Str::uuid();
+            $seatNumbers = array_map('trim', explode(',', $request->seat_numbers)); // Tratar numeros de asiento como array y eliminar los espacios en blanco
+    
+            // Verificar si algunos asientos ya han sido registrados en el evento
+            $existingSeats = Ticket::where('event_id', $request->event_id)
+                ->whereIn('seat_number', $seatNumbers)
+                ->pluck('seat_number')
+                ->toArray();
+    
+            if (!empty($existingSeats)) {
+                $data = ['error' => 'Los siguientes asientos ya han sido registrados para este evento: ' . implode(', ', $existingSeats)];
+                return response()->json($data, 400);
+            }
+    
+            DB::beginTransaction();
+    
+            $purchase = Purchase::create([
+                'purchase_id' => $purchaseID,
+                'client_name' => $request->client_name,
+                'client_mail' => $request->client_mail,
+                'client_phone' => $request->client_phone,
+            ]);
+    
+            foreach ($seatNumbers as $seatNumber) {
+                Ticket::create([
+                    'ticket_id' => (string) Str::uuid(),
+                    'purchase_id' => $purchaseID,
+                    'event_id' => $request->event_id,
+                    'seat_number' => $seatNumber,
+                    'price' => $request->price,
+                    'ticket_type' => $request->ticket_type
+                ]);
+            }
+    
+            DB::commit();
+    
+            // Comprobar que se realizo la compra correctamente
+            $data = ['purchase_id' => $purchaseID];
+            return response()->json($data, 201);
+        } catch (Exception $e) {
+            DB::rollBack();
+            $data = ['error' => 'Error al procesar la compra: ' . $e->getMessage()];
+            return response()->json($data, 500);
+        }
+    }
+```
 
 ### Ruta
 
@@ -122,6 +232,44 @@ Ticket:  Se utiliza para obtener los tickets comprados.
 
 PurchaseController: En este caso se hace uso del método “clientOrders()”, el cual obtiene todas las compras realizadas por un cliente especifico, basado en su correo electrónico, el cual debe cumplir con el formato de un correo electrónico.
 
+```php
+public function clientOrders($clientMail)
+    {
+        try {
+            // Validar que el correo electrónico sea válido
+            if (!filter_var($clientMail, FILTER_VALIDATE_EMAIL)) {
+                $data = ['error' => 'El correo electrónico proporcionado no es válido'];
+                return response()->json($data, 400);
+            }
+    
+            $orders = DB::table('purchase as p')
+                ->join('ticket as t', 'p.purchase_id', '=', 't.purchase_id')
+                ->join('event as e', 't.event_id', '=', 'e.event_id')
+                ->where('p.client_mail', $clientMail)
+                ->select(
+                    'p.purchase_id',
+                    'p.client_name',
+                    'p.client_mail',
+                    'p.client_phone',
+                    'p.purchase_date',
+                    't.event_id',
+                    'e.event_name',
+                    't.seat_number',
+                    't.price',
+                    't.ticket_type'
+                )
+                ->get();
+    
+            // Comprobar que se obtuvo la información correctamente
+            $data = $orders;
+            return response()->json($data, 200);
+        } catch (Exception $e) {
+            $data = ['error' => 'Ocurrió un error al obtener las órdenes: ' . $e->getMessage()];
+            return response()->json($data, 500);
+        }
+    }
+```
+
 ### Ruta
 
 La ruta definida para el endpoints es:
@@ -143,6 +291,45 @@ Event: Se utiliza para hacer registro de eventos en la tabla de la base de datos
 ### Controlador
 
 EventController: En este caso se hace uso del método “postEvents()”, el cual inserta eventos en la tabla event. 
+
+```php
+public function postEvents(Request $request)
+    {
+        try {
+            $request->validate([
+                'event_name' => 'required|string',
+                'organizer_name' => 'nullable|string',
+                'description' => 'nullable|string',
+                'description_details' => 'nullable|string',
+                'event_date' => 'required|date',
+                'location' => 'required|string',
+                'ticket_price' => 'required|integer'
+            ]);
+
+            $event = Event::create([
+                'event_name' => $request->event_name,
+                'organizer_name' => $request->organizer_name,
+                'description' => $request->description,
+                'description_details' => $request->description_details,
+                'event_date' => $request->event_date,
+                'location' => $request->location,
+                'ticket_price' => $request->ticket_price
+            ]);
+
+            // Comprobar que el evento se haya creado correctamente
+            if (!$event) {
+                $data = ['message' => 'Error al crear evento'];
+                return response()->json($data, 500);
+            }
+
+            $data = ['message' => 'Evento creado correctamente'];
+            return response()->json($data, 201);
+        } catch (Exception $e) {
+            $data = ['error' => 'Ocurrió un error: ' . $e->getMessage()];
+            return response()->json($data, 500);
+        }
+    }
+```
 
 ### Ruta
 
