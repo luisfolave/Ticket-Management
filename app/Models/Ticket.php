@@ -10,7 +10,7 @@ class Ticket extends Model
 {
     protected $table = 'ticket';
     protected $primaryKey = 'ticket_id';
-    public $incrementing = false;
+    public $incrementing = false; // Id no autoincremental debido a UUID
     protected $keyType = 'string';
     protected $fillable = [
         'ticket_id',

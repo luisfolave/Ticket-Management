@@ -32,6 +32,7 @@ class EventController extends Controller
                 'ticket_price' => $request->ticket_price
             ]);
 
+            // Comprobar que el evento se haya creado correctamente
             if (!$event) {
                 $data = ['message' => 'Error al crear evento'];
                 return response()->json($data, 500);
@@ -49,6 +50,8 @@ class EventController extends Controller
     {
         try {
             $events = Event::select('event_name', 'description', 'location', 'event_date')->get();
+
+            // Comprobar que se listaron los eventos correctamente
             $data = $events;
             return response()->json($data, 200);
         } catch (Exception $e) {
@@ -64,6 +67,7 @@ class EventController extends Controller
                 ->select('event_name', 'organizer_name', 'description', 'description_details', 'event_date', 'location', 'ticket_price')
                 ->first();
 
+            // Comprobar que se obtuvo informacion del evento correctamente
             if (!$event) {
                 $data = ['message' => 'Evento no encontrado'];
                 return response()->json($data, 404);
@@ -72,7 +76,7 @@ class EventController extends Controller
             $data = $event;
             return response()->json($data, 200);
         } catch (Exception $e) {
-            $data = ['error' => 'Ocurrió un error al obtener los detalles del evento: ' . $e->getMessage()];
+            $data = ['error' => 'Ocurrió un error al obtener la informacion del evento: ' . $e->getMessage()];
             return response()->json($data, 500);
         }
     }

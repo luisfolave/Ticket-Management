@@ -9,7 +9,7 @@ class Purchase extends Model
 {
     protected $table = 'purchase';
     protected $primaryKey = 'purchase_id';
-    public $incrementing = false;
+    public $incrementing = false; // Id no autoincremental debido a UUID
     protected $keyType = 'string';
     protected $fillable = [
         'purchase_id',

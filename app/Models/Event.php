@@ -11,7 +11,7 @@ class Event extends Model
 {
     protected $table = 'event';
     protected $primaryKey = 'event_id';
-    public $incrementing = false;
+    public $incrementing = false; // Id no autoincremental debido a UUID
     protected $keyType = 'string';
     protected $fillable = [
         'event_id',
@@ -28,6 +28,7 @@ class Event extends Model
     {
         parent::boot();
 
+        // Generar automaticamente UUID al generar nuevo evento
         static::creating(function ($model) {
             if (empty($model->{$model->getKeyName()})) {
                 $model->{$model->getKeyName()} = (string) Str::uuid();
