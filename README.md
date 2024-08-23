@@ -341,6 +341,18 @@ Route::post('postEvents', [EventController::class, 'postEvents']);
 
 Se da a entender, que este endpoint no es uno de los solicitados, pero es de gran importancia a la hora de registrar eventos, para luego hacer pruebas de los endpoints solicitados de manera más optima.
 
+# Evidencia
+Se adjuntan una serie de imagenes que denuncian el correcto funcionamiento de los endpoints:
+-/events
+[![Captura-de-pantalla-2024-08-23-050602.png](https://i.postimg.cc/8Cjzz42h/Captura-de-pantalla-2024-08-23-050602.png)](https://postimg.cc/p9MH0fXT)
+-/event
+[![Captura-de-pantalla-2024-08-23-050742.png](https://i.postimg.cc/j2QsFFfr/Captura-de-pantalla-2024-08-23-050742.png)](https://postimg.cc/SYRFXVVZ)
+-/purchase
+[![Captura-de-pantalla-2024-08-23-050803.png](https://i.postimg.cc/TPFYLmxB/Captura-de-pantalla-2024-08-23-050803.png)](https://postimg.cc/kVNdL2By)
+-/orders
+[![Captura-de-pantalla-2024-08-23-050819.png](https://i.postimg.cc/T1XdQ6p9/Captura-de-pantalla-2024-08-23-050819.png)](https://postimg.cc/5YnWND5Y)
+-/postEvents
+[![Captura-de-pantalla-2024-08-23-050842.png](https://i.postimg.cc/85vkh5Pc/Captura-de-pantalla-2024-08-23-050842.png)](https://postimg.cc/gXYPpGhb)
 # Supuestos
 
 - Colección POSTMAN: Se dispone de la siguiente colección POSTMAN para hacer las solicitudes a los endpoints: https://events-management.postman.co/workspace/Events-Management-Workspace~ed6518fe-5294-4ac1-9310-96f1d02f08a8/collection/30376809-84db652c-7229-446a-9007-3cb5cdf2f1b3?action=share&creator=30376809.
