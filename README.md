@@ -1,11 +1,11 @@
-## Prueba de Servicio de gestion de tickets para eventos artisticos
+# Prueba de Servicio de gestion de tickets para eventos artisticos
 
-## Introducción
+# Introducción
 Para cumplir con lo solicitado en la evaluación técnica, se desarrolla una API REST a través de HTTP utilizando JSON para el traspaso de mensajes, que tiene como finalidad simular la gestión de tickets para eventos artísticos.
 
-## Requerimientos
+# Requerimientos
 
-## Requisitos
+# Requisitos
 Para el correcto funcionamiento de la API REST se debe:
 
 - Tener instalada una versión vigente de PHP con Laravel.
@@ -13,7 +13,7 @@ Para el correcto funcionamiento de la API REST se debe:
 - Ejecutar las migraciones ‘php artisan migrate’ en la terminal.
 - Ejecutar comando ‘php artisan serve’ en la terminal para levantar el server.
 
-## Base de datos
+# Base de datos
 Se utiliza SQLite como motor de base de datos. Para configurar correctamente SQLite con Laravel debemos cerciorarnos de que el archivo .env contenga la conexión “DB_CONNECTION=sqlite”.
 Creamos las tablas:
 
@@ -21,10 +21,10 @@ Creamos las tablas:
 - purchase, con los campos: “purchase_id”, “client_name”, “client_mail”, “client_phone”, “purchase_date”.
 - ticket, con los campos: “ticket_id”, “purchase_id”, “event_id”, “seat_number”, “price”, “ticket_type”. Esta tabla, tiene como claves foráneas a “purchase_id”, referenciando a la tabla purchase, y “event_id”, referenciando a la tabla event.
 
-## Socilitudes
+# Socilitudes
 Para probar el funcionamiento del API se deben hacer solicitudes mediante POSTMAN a los endpoints generados.
 
-### */events*
+## */events*
 
 ### Metodo: GET
 
@@ -43,7 +43,7 @@ La ruta definida para el endpoints es:
 ```php
 Route::get('events', [EventController::class, 'listEvents']);
 ```
-### */event*
+## */event*
 
 ### Metodo: GET
 
@@ -65,7 +65,7 @@ Route::get('event/{eventID}', [EventController::class, 'eventDetails']);
 
 Este endpoint requiere de incluir el “event_id” del evento específico del que se quiere obtener la información.
 
-### */purchase*
+## */purchase*
 
 ### Metodo: POST
 
@@ -91,7 +91,7 @@ Route::post('purchase', [PurchaseController::class, 'buyTickets']);
 
 Para hacer una solicitud en método POST y realizar la compra se solicita rellenar un JSON con los campos: "client_name", "client_mail", "client_phone", "event_id", "seat_numbers", "ticket_type".
 
-### */orders*
+## */orders*
 
 ### Metodo: GET
 
@@ -117,7 +117,7 @@ Route::get('orders/{clientMail}', [PurchaseController::class, 'clientOrders']);
 
 Este endpoint requiere de incluir el correo electrónico del cliente del cual se espera recibir los datos de compra.
 
-### */postEvents*
+## */postEvents*
 
 ### Metodo: POST
 
