@@ -3,9 +3,9 @@
 ## Introducción
 Para cumplir con lo solicitado en la evaluación técnica, se desarrolla una API REST a través de HTTP utilizando JSON para el traspaso de mensajes, que tiene como finalidad simular la gestión de tickets para eventos artísticos.
 
-##Requerimientos
+## Requerimientos
 
-##Requisitos
+## Requisitos
 Para el correcto funcionamiento de la API REST se debe:
 
 - Tener instalada una versión vigente de PHP con Laravel.
@@ -13,10 +13,10 @@ Para el correcto funcionamiento de la API REST se debe:
 - Ejecutar las migraciones ‘php artisan migrate’ en la terminal.
 - Ejecutar comando ‘php artisan serve’ en la terminal para levantar el server.
 
-##Base de datos
+## Base de datos
 Se utiliza SQLite como motor de base de datos. Para configurar correctamente SQLite con Laravel debemos cerciorarnos de que el archivo .env contenga la conexión “DB_CONNECTION=sqlite”.
 
-##Socilitudes
+## Socilitudes
 Para probar el funcionamiento del API se deben hacer solicitudes mediante POSTMAN a los endpoints generados.
 
 ### /events
