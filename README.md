@@ -35,6 +35,21 @@ Event: Este modelo representa la tabla “event” en la base de datos. El model
 ### Controlador
 
 EventController: Este controlador maneja las operaciones que tiene relación a los eventos. En particular, se hace uso del método “listEvents()”, el cual realiza una consulta para obtener la lista de eventos disponibles en la base de datos, y retorna los datos más relevantes de cada uno, en formato JSON.
+```php
+public function listEvents()
+    {
+        try {
+            $events = Event::select('event_name', 'description', 'location', 'event_date')->get();
+
+            // Comprobar que se listaron los eventos correctamente
+            $data = $events;
+            return response()->json($data, 200);
+        } catch (Exception $e) {
+            $data = ['error' => 'Ocurrió un error al obtener los eventos: ' . $e->getMessage()];
+            return response()->json($data, 500);
+        }
+    }
+```
 
 ### Ruta
 
