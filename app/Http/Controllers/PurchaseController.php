@@ -38,10 +38,11 @@ class PurchaseController extends Controller
                         foreach ($seats as $seat) {
                             if (!preg_match('/^[A-Z]\d{1,}$/', $seat)) {
                                 $fail("El asiento $seat no tiene un formato válido.");
+                            } elseif (strlen($seat) !== 3){
+                                $fail("El asiento $seat debe tener exactamente 3 caracteres"); // Validar que el asiento este compuesto de 3 caracteres
                             }
                         }
-                    },
-                    'size:3' // Validar formato de asiento con 3 caracteres
+                    }
                 ],
                 'ticket_type' => ['required', Rule::in(['Regular', 'Premium'])], // Validar tipo de ticket entre dos tipos
                 'price' => [
