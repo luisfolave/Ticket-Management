@@ -343,15 +343,15 @@ Se da a entender, que este endpoint no es uno de los solicitados, pero es de gra
 
 # Evidencia
 Se adjuntan una serie de imagenes que denuncian el correcto funcionamiento de los endpoints:
-###/events
+### /events
 [![Captura-de-pantalla-2024-08-23-050602.png](https://i.postimg.cc/8Cjzz42h/Captura-de-pantalla-2024-08-23-050602.png)](https://postimg.cc/p9MH0fXT)
-###/event
+### /event
 [![Captura-de-pantalla-2024-08-23-050742.png](https://i.postimg.cc/j2QsFFfr/Captura-de-pantalla-2024-08-23-050742.png)](https://postimg.cc/SYRFXVVZ)
-###/purchase
+### /purchase
 [![Captura-de-pantalla-2024-08-23-050803.png](https://i.postimg.cc/TPFYLmxB/Captura-de-pantalla-2024-08-23-050803.png)](https://postimg.cc/kVNdL2By)
-###/orders
+### /orders
 [![Captura-de-pantalla-2024-08-23-050819.png](https://i.postimg.cc/T1XdQ6p9/Captura-de-pantalla-2024-08-23-050819.png)](https://postimg.cc/5YnWND5Y)
-###/postEvents
+### /postEvents
 [![Captura-de-pantalla-2024-08-23-050842.png](https://i.postimg.cc/85vkh5Pc/Captura-de-pantalla-2024-08-23-050842.png)](https://postimg.cc/gXYPpGhb)
 
 # Supuestos
